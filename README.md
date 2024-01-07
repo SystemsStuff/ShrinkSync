@@ -1,0 +1,2 @@
+# ShrinkSync
+A MapReduce implementation
