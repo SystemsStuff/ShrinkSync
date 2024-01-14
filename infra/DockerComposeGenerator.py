@@ -10,7 +10,11 @@ def generate_docker_compose(map_node_count, reduce_node_count):
     ports:
         - "{port_number}:8080"
     volumes:
-        - /var/run/docker.sock:/var/run/docker.sock    
+        - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+        - MAP_NODE_COUNT= {map_node_count}
+        - REDUCE_NODE_COUNT= {reduce_node_count}
+        - NAME= master
 '''
 
     compose_file_content+=master_definition
@@ -26,7 +30,12 @@ def generate_docker_compose(map_node_count, reduce_node_count):
     ports:
         - "{port_number}:8080"
     volumes:
-        - /var/run/docker.sock:/var/run/docker.sock
+        - /var/run/docker.sock:/var/run/docker.sock'''
+        compose_file_content+=f'''
+    environment:
+        - MAP_NODE_COUNT= {map_node_count}
+        - REDUCE_NODE_COUNT= {reduce_node_count}
+        - NAME= {service_name}
 '''
         port_number+=1
 
@@ -40,7 +49,12 @@ def generate_docker_compose(map_node_count, reduce_node_count):
     ports:
         - "{port_number}:8080"
     volumes:
-        - /var/run/docker.sock:/var/run/docker.sock
+        - /var/run/docker.sock:/var/run/docker.sock'''
+        compose_file_content+=f'''
+    environment:
+        - MAP_NODE_COUNT= {map_node_count}
+        - REDUCE_NODE_COUNT= {reduce_node_count}
+        - NAME= {service_name}
 '''
         port_number+=1
 
