@@ -32,7 +32,7 @@ func HealthHandler(rw http.ResponseWriter, r *http.Request) {
 	var wg sync.WaitGroup
 	fmt.Printf("Received post request on health handler with message: %s\n", body)
 	fmt.Printf("Broadcasting /echo request to all the containers on the network...\n")
-	nodes := utils.DiscoverNodes(networkName)
+	nodes := utils.GetNodes()
 	for _, node := range nodes {
 		wg.Add(1)
 		go func(nd string) {
