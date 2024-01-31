@@ -1,5 +1,4 @@
 def generate_docker_compose(map_node_count, reduce_node_count):
-    port_number = 8080
     compose_file_content = f'''services:'''
 
     master_definition = f'''
@@ -7,10 +6,6 @@ def generate_docker_compose(map_node_count, reduce_node_count):
     build: .
     image: shrink-sync-node
     container_name: master
-    ports:
-        - "{port_number}:8080"
-    volumes:
-        - /var/run/docker.sock:/var/run/docker.sock
     environment:
         - MAP_NODE_COUNT= {map_node_count}
         - REDUCE_NODE_COUNT= {reduce_node_count}
@@ -18,7 +13,6 @@ def generate_docker_compose(map_node_count, reduce_node_count):
 '''
 
     compose_file_content+=master_definition
-    port_number+=1
 
     for i in range(1, map_node_count + 1):
         service_name = f'map-{i}'
@@ -26,18 +20,13 @@ def generate_docker_compose(map_node_count, reduce_node_count):
   {service_name}:
     build: .
     image: shrink-sync-node
-    container_name: {service_name}
-    ports:
-        - "{port_number}:8080"
-    volumes:
-        - /var/run/docker.sock:/var/run/docker.sock'''
+    container_name: {service_name}'''
         compose_file_content+=f'''
     environment:
         - MAP_NODE_COUNT= {map_node_count}
         - REDUCE_NODE_COUNT= {reduce_node_count}
         - NAME= {service_name}
 '''
-        port_number+=1
 
     for i in range(1, reduce_node_count + 1):
         service_name = f'reduce-{i}'
@@ -45,18 +34,13 @@ def generate_docker_compose(map_node_count, reduce_node_count):
   {service_name}:
     build: .
     image: shrink-sync-node
-    container_name: {service_name}
-    ports:
-        - "{port_number}:8080"
-    volumes:
-        - /var/run/docker.sock:/var/run/docker.sock'''
+    container_name: {service_name}'''
         compose_file_content+=f'''
     environment:
         - MAP_NODE_COUNT= {map_node_count}
         - REDUCE_NODE_COUNT= {reduce_node_count}
         - NAME= {service_name}
 '''
-        port_number+=1
 
     network_definition = f'''\
 networks:
