@@ -6,3 +6,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: printf '1\n1\n' | make
+      - name: Container Check
+        if: docker inspect shrink-sync-network | grep Name | wc -l != 5
+        run: |
+          echo "All the 4 Containers are not created!!"
+          exit 1
