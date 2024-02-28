@@ -5,9 +5,9 @@ infra:
 	- cd infra && docker compose up -d --build
 	- echo "\nInfra Setup Done"
 
-datagrid:
+datagrid: infra
 	- cd DataGrid && docker build -t datagrid .
-	- docker run --name datagrid -d -p 21:21 datagrid
+	- docker run --name datagrid --network=shrink-sync-network -d -p 21:21 datagrid
 	- echo "\nDatagrid Started on port 21"
 
 clean:
