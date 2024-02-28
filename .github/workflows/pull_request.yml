@@ -8,7 +8,7 @@ jobs:
       - run: printf '1\n1\n' | make
       - run: docker inspect shrink-sync-network | grep Name | wc -l >> $(CONTAINER_COUNT)
       - name: Container Check
-        if: $(CONTAINER_COUNT) != 5
+        if: ${{ CONTAINER_COUNT }} != 5
         run: |
           echo "All the 4 Containers are not created!!"
           exit 1
