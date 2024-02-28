@@ -1,0 +1,8 @@
+run-name: ${{ github.actor }} opened a pull request
+on: [ pull_request ]
+jobs:
+  setup-shrink-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: make
