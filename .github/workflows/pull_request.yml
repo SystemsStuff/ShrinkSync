@@ -2,7 +2,7 @@ run-name: ${{ github.actor }} opened a pull request
 on: [ pull_request ]
 jobs:
   setup-shrink-sync:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     env:
       CONTAINER_COUNT: 0
     steps:
@@ -12,5 +12,5 @@ jobs:
       - name: Container Check
         if: ${{ env.CONTAINER_COUNT != 5 }}
         run: |
-          echo "All the 4 Containers are not created!!"
+          echo "All the 4 Containers are not created, Created container are $CONTAINER_COUNT!!"
           exit 1
