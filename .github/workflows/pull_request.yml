@@ -2,13 +2,13 @@ run-name: ${{ github.actor }} opened a pull request
 on: [ pull_request ]
 jobs:
   setup-shrink-sync:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     env:
       CONTAINER_COUNT: 0
     steps:
       - uses: actions/checkout@v4
       - run: printf '1\n1\n' | make
-      - run: CONTAINER_COUNT=$(docker inspect shrink-sync-network | grep Name | wc -l)
+      - run: CONTAINER_COUNT="$(docker inspect shrink-sync-network | grep Name | wc -l)"
       - name: Container Check
         if: ${{ env.CONTAINER_COUNT != 5 }}
         run: |
