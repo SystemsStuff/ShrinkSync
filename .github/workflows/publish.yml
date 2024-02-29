@@ -11,17 +11,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Go version
         uses: actions/setup-go@v2
         with:
           go-version: '1.21.5'
-
-      - name: Set up Git
-        run: |
-          git config --global user.email "reethu.vinta@gmail.com"
-          git config --global user.name "Reethu Vinta"
 
       - name: Build and test Go module
         run: |
@@ -29,35 +24,24 @@ jobs:
           go build ./...
           go test ./...
 
-      - name: Determine Version
-        id: determine_version
+      - name: Set up Git
         run: |
-          VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-          IFS='.' read -r major minor patch <<< "$VERSION"
-          if [ "$VERSION" = "v0.0.0" ]; then
-            NEXT_VERSION="v0.0.0"
-          else
-            NEXT_VERSION="$major.$minor.$((patch + 1))"
-          fi  
-          echo "::set-output name=next_version::$NEXT_VERSION"
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+
+      - name: Determine Version
+        run: |
+          git fetch --tags
+          latest_tag=$(git describe --tags "$(git rev-list --tags --max-count=1)")
+          IFS='.' read -r major minor patch <<< "$latest_tag"
+          NEXT_VERSION="$major.$minor.$((patch + 1))"
+          echo "next_version=$NEXT_VERSION" >> $GITHUB_ENV
 
       - name: Create Release Tag
-        id: create_tag
         run: |
-          git tag -a ${{ steps.determine_version.outputs.next_version }} -m "Release ${{ steps.determine_version.outputs.next_version }}"
-          echo "::set-output name=tag::${{ steps.determine_version.outputs.next_version }}"
+          git tag -a ${{ env.next_version }} -m "Release ${{ env.next_version }}"
+          echo "tag=${{ env.next_version }}" >> $GITHUB_ENV
 
       - name: Push Tag to Repository
-        run: git push origin ${{ steps.create_tag.outputs.tag }}
-
-      - name: Index ShrinkSync Module
-        run: GOPROXY=proxy.golang.org go list -m github.com/SystemsStuff/ShrinkSync@${{ steps.create_tag.outputs.tag }}     
-           
-      - name: Verify release
         run: |
-          if go get github.com/SystemsStuff/ShrinkSync@${{ steps.create_tag.outputs.tag }}; then
-            echo "Version released successfully"
-          else
-            echo "Something went wrong with the release. Please check!"
-            exit 1
-          fi           
+          git push origin ${{ env.tag }}
