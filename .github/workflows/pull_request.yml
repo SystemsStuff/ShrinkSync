@@ -3,14 +3,17 @@ on: [ pull_request ]
 jobs:
   setup-shrink-sync:
     runs-on: ubuntu-latest
-    env:
-      CONTAINER_COUNT: 0
+
     steps:
       - uses: actions/checkout@v4
-      - run: printf '1\n1\n' | make
-      - run: CONTAINER_COUNT="$(docker inspect shrink-sync-network | grep Name | wc -l)"
-      - name: Container Check
-        if: ${{ env.CONTAINER_COUNT != 5 }}
+      
+      - name: Infra Setup
         run: |
-          echo "All the 4 Containers are not created, Created container are $CONTAINER_COUNT!!"
+          printf '1\n1\n' | make
+          echo "CONTAINER_COUNT=$(docker inspect shrink-sync-network | grep Name | wc -l)" >> $GITHUB_ENV     
+      
+      - name: Test Setup    
+        if: env.CONTAINER_COUNT != 5 
+        run: |
+          echo "All the 4 Containers are not created, Created container are $(CONTAINER_COUNT)!!"
           exit 1
