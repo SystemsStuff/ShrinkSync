@@ -7,9 +7,9 @@ def generate_docker_compose(map_node_count, reduce_node_count):
     image: shrink-sync-node
     container_name: master
     environment:
-        - MAP_NODE_COUNT= {map_node_count}
-        - REDUCE_NODE_COUNT= {reduce_node_count}
-        - NAME= master
+        - MAP_NODE_COUNT={map_node_count}
+        - REDUCE_NODE_COUNT={reduce_node_count}
+        - NAME=master
 '''
 
     compose_file_content+=master_definition
@@ -23,9 +23,9 @@ def generate_docker_compose(map_node_count, reduce_node_count):
     container_name: {service_name}'''
         compose_file_content+=f'''
     environment:
-        - MAP_NODE_COUNT= {map_node_count}
-        - REDUCE_NODE_COUNT= {reduce_node_count}
-        - NAME= {service_name}
+        - MAP_NODE_COUNT={map_node_count}
+        - REDUCE_NODE_COUNT={reduce_node_count}
+        - NAME={service_name}
 '''
 
     for i in range(1, reduce_node_count + 1):
@@ -37,9 +37,9 @@ def generate_docker_compose(map_node_count, reduce_node_count):
     container_name: {service_name}'''
         compose_file_content+=f'''
     environment:
-        - MAP_NODE_COUNT= {map_node_count}
-        - REDUCE_NODE_COUNT= {reduce_node_count}
-        - NAME= {service_name}
+        - MAP_NODE_COUNT={map_node_count}
+        - REDUCE_NODE_COUNT={reduce_node_count}
+        - NAME={service_name}
 '''
 
     network_definition = f'''\
