@@ -1,0 +1,30 @@
+services:
+  master:
+    build: .
+    image: shrink-sync-node
+    container_name: master
+    environment:
+        - MAP_NODE_COUNT= 1
+        - REDUCE_NODE_COUNT= 1
+        - NAME= master
+  map-1:
+    build: .
+    image: shrink-sync-node
+    container_name: map-1
+    environment:
+        - MAP_NODE_COUNT= 1
+        - REDUCE_NODE_COUNT= 1
+        - NAME= map-1
+  reduce-1:
+    build: .
+    image: shrink-sync-node
+    container_name: reduce-1
+    environment:
+        - MAP_NODE_COUNT= 1
+        - REDUCE_NODE_COUNT= 1
+        - NAME= reduce-1
+networks:
+  default:
+    name: shrink-sync-network
+    driver: bridge   
+    
