@@ -43,3 +43,8 @@ A map reduce job is defined by extending the `Map` struct and the `Reduce` struc
 
 ### CLI
 After defining the job in a directory, a CLI can be used to start the job with files in that directory. Using that CLI, user can set number of map nodes, number of reduce nodes and data location. The job files are copied over to docker containers before starting them. The user code is shared to the MapReduce infra using this approach.
+
+## Usage flow
+A user who wants to use ShrinkSync will first download the CLI. Then, they will initialize a folder as a ShrinkSync job(something similar to an `init` command). This initialization will create a skeleton project where users can write their code. There will be a config file that takes in parameters like location of input data, number of map nodes, number of reduce nodes etc. Once they prepared their job with required `map` and `reduce` functions, they use the CLI to start the job(something like a `start` command). Before this, users need to make sure the datagrid from which the job takes input is `UP`. The CLI will then start the infra(master, map and reduce nodes) with the user code already in them.
+
+The CLI utility keeps giving updates on the job through the terminal using the "infra-health" endpoint on master node. Once the job is executed, the infrastructure is brought down and CLI returns the location of the output.
