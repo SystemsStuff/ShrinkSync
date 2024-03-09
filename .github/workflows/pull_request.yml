@@ -12,8 +12,14 @@ jobs:
           printf '1\n1\n' | make
           echo "CONTAINER_COUNT=$(docker inspect shrink-sync-network | grep Name | wc -l)" >> $GITHUB_ENV     
       
-      - name: Test Setup    
-        if: env.CONTAINER_COUNT != 5 
+      - name: Test Setup   
         run: |
-          echo "All the 4 Containers are not created, Created container are $(CONTAINER_COUNT)!!"
-          exit 1
+          if [[ $CONTAINER_COUNT == 5 ]] 
+          then
+            echo "Hurray! All the 4 containers are created!"            
+          else
+            echo "ERROR! Expected 4 containers but found $((CONTAINER_COUNT-1))"
+            exit 1
+          fi
+
+          
