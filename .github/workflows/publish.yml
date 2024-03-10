@@ -1,0 +1,47 @@
+name: Release Go Module
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go version
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.21.5'
+
+      - name: Build and test Go module
+        run: |
+          go mod tidy
+          go build ./...
+          go test ./...
+
+      - name: Set up Git
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+
+      - name: Determine Version
+        run: |
+          git fetch --tags
+          latest_tag=$(git describe --tags "$(git rev-list --tags --max-count=1)")
+          IFS='.' read -r major minor patch <<< "$latest_tag"
+          NEXT_VERSION="$major.$minor.$((patch + 1))"
+          echo "next_version=$NEXT_VERSION" >> $GITHUB_ENV
+
+      - name: Create Release Tag
+        run: |
+          git tag -a ${{ env.next_version }} -m "Release ${{ env.next_version }}"
+          echo "tag=${{ env.next_version }}" >> $GITHUB_ENV
+
+      - name: Push Tag to Repository
+        run: |
+          git push origin ${{ env.tag }}
