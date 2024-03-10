@@ -46,7 +46,7 @@ def generate_docker_compose(map_node_count, reduce_node_count):
 networks:
   default:
     name: shrink-sync-network
-    driver: bridge   
+    external: true
     
 '''
     compose_file_content += network_definition
