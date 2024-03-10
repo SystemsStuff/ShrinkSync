@@ -1,2 +1,2 @@
-infra/docker-compose.yaml
 bin
+cli/docker-compose.yaml
