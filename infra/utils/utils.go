@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"time"
 )
 
 type NodesStatus struct {
@@ -48,4 +49,19 @@ func GetNodes() []string {
 	}
 	res = append(res, "master")
 	return res
+}
+
+func StatusCheck() {
+	for {
+		log.Printf("Heartbeat check...")
+		response := GetNodesStatus()
+		nodes := GetNodes()
+		for _, node := range nodes {
+			if response.StatusJson[node] != "UP" {
+				// take appropriate action when the node is down
+				log.Printf("node %s is DOWN...\n", node)
+			}
+		}
+		time.Sleep(1 * time.Minute)
+	}
 }
