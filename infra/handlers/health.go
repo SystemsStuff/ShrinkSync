@@ -8,11 +8,11 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/SystemsStuff/ShrinkSync/sampleServer/utils"
+	"github.com/SystemsStuff/ShrinkSync/infra/utils"
 )
 
 const (
-	networkName string = "shrinksync_my-network" // suffix need to change according to docker-compose
+	networkName string = "shrink-sync-network" // suffix need to change according to docker-compose
 )
 
 type message struct {
