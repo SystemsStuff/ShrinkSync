@@ -1,7 +1,12 @@
-package node_handlers
+package master
 
 import (
+	"fmt"
+	"html"
+	"log"
 	"net/http"
+
+	"github.com/SystemsStuff/ShrinkSync/core/utils"
 )
 
 func MasterHandler(rw http.ResponseWriter, r *http.Request) {
@@ -14,7 +19,7 @@ func MasterHandler(rw http.ResponseWriter, r *http.Request) {
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path[1:]))
 	})
-	mux.HandleFunc("/infra-health", handlers.InfraHealthHandler)
+	mux.HandleFunc("/infra-health", InfraHealthHandler)
 
 	log.Fatal(http.ListenAndServe(":9090", mux))
 }

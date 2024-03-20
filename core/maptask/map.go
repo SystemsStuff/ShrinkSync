@@ -1,4 +1,4 @@
-package node_handlers
+package maptask
 
 import (
 	"net/http"
