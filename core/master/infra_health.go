@@ -1,10 +1,10 @@
-package handlers
+package master
 
 import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/SystemsStuff/ShrinkSync/infra/utils"
+	"github.com/SystemsStuff/ShrinkSync/core/utils"
 )
 
 func InfraHealthHandler(rw http.ResponseWriter, r *http.Request) {

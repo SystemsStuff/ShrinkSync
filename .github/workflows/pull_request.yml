@@ -1,3 +1,4 @@
+name: Test Infra setup
 run-name: ${{ github.actor }} opened a pull request
 on: [ pull_request ]
 jobs:
@@ -9,6 +10,7 @@ jobs:
       
       - name: Infra Setup
         run: |
+          cd cli
           printf '1\n1\n' | make
           echo "CONTAINER_COUNT=$(docker inspect shrink-sync-network | grep Name | wc -l)" >> $GITHUB_ENV     
       

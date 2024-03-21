@@ -1,4 +1,4 @@
-package handlers
+package master
 
 import (
 	"encoding/json"
@@ -8,11 +8,11 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/SystemsStuff/ShrinkSync/infra/utils"
+	"github.com/SystemsStuff/ShrinkSync/core/utils"
 )
 
 const (
-	networkName string = "shrink-sync-network" // suffix need to change according to docker-compose
+	networkName string = "shrink-sync-network"
 )
 
 type message struct {
