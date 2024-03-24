@@ -12,9 +12,11 @@ func InitMaster(mux *http.ServeMux) {
 
 	fmt.Println(mapNodeCount, reduceNodeCount)
 	mux.HandleFunc("GET /infra-health", InfraHealthHandler)
+
+	startNodeStatusMonitor()
 }
 
-func MasterHandler() {
+func startNodeStatusMonitor() {
 	// go routine to periodically check status of all worker nodes, need to handle the case of this becoming an "orphan"
 	go utils.StatusCheck()
 }

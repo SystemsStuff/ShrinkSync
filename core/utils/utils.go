@@ -5,25 +5,42 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"sync"
 	"time"
 )
 
 func PingNode(node string) error {
-	cmd := exec.Command("ping", "-c", "2", node)
+	cmd := exec.Command("ping", "-c", "1", node)
 	err := cmd.Run()
 	return err
 }
 
 func GetNodesStatus() map[string]string {
 	nodes := GetNodes()
-	response := make(map[string]string)
+	statusMap := sync.Map{}
+
+	var wg sync.WaitGroup
+	// Check status of nodes concurrently
 	for _, node := range nodes {
-		if err := PingNode(node); err != nil {
-			response[node] = "DOWN"
-		} else {
-			response[node] = "UP"
-		}
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			if err := PingNode(node); err != nil {
+				statusMap.Store(node, "DOWN")
+			} else {
+				statusMap.Store(node, "UP")
+			}
+		}()
 	}
+	wg.Wait()
+
+	// Convert sync.map to map
+	response := make(map[string]string)
+	statusMap.Range(func(key, value any) bool {
+		response[key.(string)] = value.(string)
+		return true
+	})
+
 	return response
 }
 
@@ -63,6 +80,6 @@ func StatusCheck() {
 				log.Printf("node %s is DOWN...\n", node)
 			}
 		}
-		time.Sleep(1 * time.Minute)
+		time.Sleep(5 * time.Second)
 	}
 }
