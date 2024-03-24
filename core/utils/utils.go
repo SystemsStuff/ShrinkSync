@@ -8,47 +8,48 @@ import (
 	"time"
 )
 
-type NodesStatus struct {
-	StatusJson map[string]string `json:"nodes_status"`
-}
-
 func PingNode(node string) error {
-	cmd := exec.Command("ping", "-w", "2", node)
+	cmd := exec.Command("ping", "-c", "2", node)
 	err := cmd.Run()
 	return err
 }
 
-func GetNodesStatus() *NodesStatus {
+func GetNodesStatus() map[string]string {
 	nodes := GetNodes()
-	response := &NodesStatus{
-		StatusJson: make(map[string]string),
-	}
+	response := make(map[string]string)
 	for _, node := range nodes {
 		if err := PingNode(node); err != nil {
-			response.StatusJson[node] = "DOWN"
+			response[node] = "DOWN"
 		} else {
-			response.StatusJson[node] = "UP"
+			response[node] = "UP"
 		}
 	}
 	return response
 }
 
 func GetNodes() []string {
-	mapNodes, _ := strconv.ParseInt(os.Getenv("MAP_NODE_COUNT"), 10, 64)
-	reduceNodes, err := strconv.ParseInt(os.Getenv("REDUCE_NODE_COUNT"), 10, 64)
-	if err != nil {
-		log.Fatal("Error parsing the env variables")
-	}
+	mapNodes, reduceNodes := GetNodesCountByType()
 	res := []string{}
-	var i int64
-	for i = 1; i <= mapNodes; i++ {
+	for i := 1; i <= mapNodes; i++ {
 		res = append(res, "map-"+strconv.Itoa(int(i)))
 	}
-	for i = 1; i <= reduceNodes; i++ {
+	for i := 1; i <= reduceNodes; i++ {
 		res = append(res, "reduce-"+strconv.Itoa(int(i)))
 	}
 	res = append(res, "master")
 	return res
+}
+
+func GetNodesCountByType() (int, int) {
+	mapNodes, err := strconv.Atoi(os.Getenv("MAP_NODE_COUNT"))
+	if err != nil {
+		log.Fatal("Error parsing MAP_NODE_COUNT")
+	}
+	reduceNodes, err := strconv.Atoi(os.Getenv("REDUCE_NODE_COUNT"))
+	if err != nil {
+		log.Fatal("Error parsing REDUCE_NODE_COUNT")
+	}
+	return mapNodes, reduceNodes
 }
 
 func StatusCheck() {
@@ -57,7 +58,7 @@ func StatusCheck() {
 		response := GetNodesStatus()
 		nodes := GetNodes()
 		for _, node := range nodes {
-			if response.StatusJson[node] != "UP" {
+			if response[node] != "UP" {
 				// take appropriate action when the node is down
 				log.Printf("node %s is DOWN...\n", node)
 			}
