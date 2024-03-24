@@ -20,9 +20,6 @@ type message struct {
 }
 
 func HealthHandler(rw http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		log.Fatal("Method not supported!")
-	}
 	decoder := json.NewDecoder(r.Body)
 	var body message
 	err := decoder.Decode(&body)

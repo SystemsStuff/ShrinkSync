@@ -20,11 +20,11 @@ func NewShrinkSyncJob() {
 	
 	switch getNodeType(os.Getenv("NAME")) {
 	case MASTER:
-		mux.HandleFunc("/infraHealth", master.MasterHandler)
+		mux.HandleFunc("GET /infraHealth", master.MasterHandler)
 	case REDUCE:
-		mux.HandleFunc("/endpoint", reducetask.ReduceHandler)
+		mux.HandleFunc("GET /endpoint", reducetask.ReduceHandler)
 	case MAP:
-		mux.HandleFunc("/endpoint", maptask.MapHandler)
+		mux.HandleFunc("GET /endpoint", maptask.MapHandler)
 	}
 
 	fmt.Println("Starting server on port 8080...")
