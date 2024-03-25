@@ -15,25 +15,7 @@ func PingNode(node string) error {
 	return err
 }
 
-func GetNodesStatus() map[string]string {
-	nodes := GetNodes()
-	statusMap := sync.Map{}
-
-	var wg sync.WaitGroup
-	// Check status of nodes concurrently
-	for _, node := range nodes {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			if err := PingNode(node); err != nil {
-				statusMap.Store(node, "DOWN")
-			} else {
-				statusMap.Store(node, "UP")
-			}
-		}()
-	}
-	wg.Wait()
-
+func GetNodesStatus(statusMap *sync.Map) map[string]string {
 	// Convert sync.map to map
 	response := make(map[string]string)
 	statusMap.Range(func(key, value any) bool {
@@ -69,17 +51,36 @@ func GetNodesCountByType() (int, int) {
 	return mapNodes, reduceNodes
 }
 
-func StatusCheck() {
+func updateNodeStatus(statusMap *sync.Map) {
+	nodes := GetNodes()
+
+	var wg sync.WaitGroup
+	// Check status of nodes concurrently
+	for _, node := range nodes {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			if err := PingNode(node); err != nil {
+				statusMap.Store(node, "DOWN")
+			} else {
+				statusMap.Store(node, "UP")
+			}
+		}()
+	}
+	wg.Wait()
+}
+
+func StatusCheck(statusMap *sync.Map, interval time.Duration) {
 	for {
 		log.Printf("Heartbeat check...")
-		response := GetNodesStatus()
-		nodes := GetNodes()
-		for _, node := range nodes {
-			if response[node] != "UP" {
+		updateNodeStatus(statusMap)
+		statusMap.Range(func(node, status any) bool {
+			if status.(string) != "UP" {
 				// take appropriate action when the node is down
-				log.Printf("node %s is DOWN...\n", node)
+				log.Printf("node %s is DOWN...\n", node.(string))
 			}
-		}
-		time.Sleep(5 * time.Second)
+			return true
+		})
+		time.Sleep(interval)
 	}
 }

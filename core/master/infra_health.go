@@ -7,8 +7,8 @@ import (
 	"github.com/SystemsStuff/ShrinkSync/core/utils"
 )
 
-func InfraHealthHandler(rw http.ResponseWriter, r *http.Request) {
-	nodes_status := utils.GetNodesStatus()
+func (masterContext *MasterContext) InfraHealthHandler(rw http.ResponseWriter, r *http.Request) {
+	nodes_status := utils.GetNodesStatus(&masterContext.statusMap)
 	rw.Header().Set("Content-Type", "application/json")
 	encoder := json.NewEncoder(rw)
 	if err := encoder.Encode(nodes_status); err != nil {

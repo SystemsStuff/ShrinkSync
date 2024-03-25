@@ -15,8 +15,9 @@ var MASTER = "master"
 var MAP = "map"
 var REDUCE = "reduce"
 
-type mapTask func(key, value string)
+type mapTask func(lineItem, lineIndex string)
 type reduceTask func(key string, valuesList []string)
+
 type ShrinkSyncJob struct {
 	mapTask mapTask
 	reduceTask reduceTask
@@ -24,6 +25,14 @@ type ShrinkSyncJob struct {
 
 func NewShrinkSyncJob() (*ShrinkSyncJob) {
 	return &ShrinkSyncJob{};
+}
+
+func (job *ShrinkSyncJob) SetMapTask(mapper mapTask) {
+	job.mapTask = mapper
+}
+
+func (job *ShrinkSyncJob) SetReduceTask(reducer reduceTask) {
+	job.reduceTask = reducer
 }
 
 func (*ShrinkSyncJob) Start() {
