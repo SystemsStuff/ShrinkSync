@@ -6,7 +6,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/SystemsStuff/ShrinkSync/core/node_handlers"
+	"github.com/SystemsStuff/ShrinkSync/core/maptask"
+	"github.com/SystemsStuff/ShrinkSync/core/master"
+	"github.com/SystemsStuff/ShrinkSync/core/reducetask"
 )
 
 var MASTER = "master"
@@ -18,11 +20,11 @@ func NewShrinkSyncJob() {
 	
 	switch getNodeType(os.Getenv("NAME")) {
 	case MASTER:
-		mux.HandleFunc("/infraHealth", node_handlers.MasterHandler)
+		mux.HandleFunc("/infraHealth", master.MasterHandler)
 	case REDUCE:
-		mux.HandleFunc("/endpoint", node_handlers.ReduceHandler)
+		mux.HandleFunc("/endpoint", reducetask.ReduceHandler)
 	case MAP:
-		mux.HandleFunc("/endpoint", node_handlers.MapHandler)
+		mux.HandleFunc("/endpoint", maptask.MapHandler)
 	}
 
 	fmt.Println("Starting server on port 8080...")
