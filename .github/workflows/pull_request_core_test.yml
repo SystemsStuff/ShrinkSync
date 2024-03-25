@@ -1,0 +1,21 @@
+name: Build core package
+run-name: ${{ github.actor }} opened a pull request
+on:
+  pull_request:
+    paths:
+      - core/**
+jobs:
+  build-core:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Go version
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.22.1'
+
+      - name: Build core
+        run: cd core && go build
+          

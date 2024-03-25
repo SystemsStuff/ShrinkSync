@@ -1,6 +1,6 @@
 module example/hello
 
-go 1.21.5
+go 1.22.1
 
 require (
 	github.com/hashicorp/errwrap v1.0.0 // indirect

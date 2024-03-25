@@ -8,10 +8,6 @@ import (
 )
 
 func InfraHealthHandler(rw http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		rw.WriteHeader(http.StatusMethodNotAllowed)
-		rw.Write([]byte("Method Not Allowed"))
-	}
 	nodes_status := utils.GetNodesStatus()
 	encoder := json.NewEncoder(rw)
 	if err := encoder.Encode(nodes_status); err != nil {
