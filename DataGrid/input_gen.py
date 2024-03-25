@@ -24,8 +24,8 @@ def generate_test_data(output_dir, file_prefix, file_count, line_count):
     partition_files = []
     for i in range(file_count):
         words = [generate_word() for _ in range(line_count)]
-        partition_files.append(output_dir + "/" + file_prefix + "_" + str(i))
-        write_to_file(partition_files[i], words)
+        partition_files.append(file_prefix + "_" + str(i))
+        write_to_file(output_dir + "/" + partition_files[i], words)
     # creates the metadata file
     metadata_file = output_dir + "/" + file_prefix + "_metadata"
     logging.info("Creating metadata file: %s" % metadata_file)

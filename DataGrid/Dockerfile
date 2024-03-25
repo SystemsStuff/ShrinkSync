@@ -7,3 +7,7 @@ RUN python3 input_gen.py /DataGrid/Input wordCount 3 5
 RUN pip3 install -r requirements.txt
 CMD python3 ftp_server.py
 EXPOSE 21
+# Starting HTTP server
+WORKDIR /DataGrid/Input/
+CMD python3 -m http.server 8000
+EXPOSE 21 8000
