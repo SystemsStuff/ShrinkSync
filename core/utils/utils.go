@@ -5,63 +5,82 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"sync"
 	"time"
 )
 
-type NodesStatus struct {
-	StatusJson map[string]string `json:"nodes_status"`
-}
-
 func PingNode(node string) error {
-	cmd := exec.Command("ping", "-w", "2", node)
+	cmd := exec.Command("ping", "-c", "1", node)
 	err := cmd.Run()
 	return err
 }
 
-func GetNodesStatus() *NodesStatus {
-	nodes := GetNodes()
-	response := &NodesStatus{
-		StatusJson: make(map[string]string),
-	}
-	for _, node := range nodes {
-		if err := PingNode(node); err != nil {
-			response.StatusJson[node] = "DOWN"
-		} else {
-			response.StatusJson[node] = "UP"
-		}
-	}
+func GetNodesStatus(statusMap *sync.Map) map[string]string {
+	// Convert sync.map to map
+	response := make(map[string]string)
+	statusMap.Range(func(key, value any) bool {
+		response[key.(string)] = value.(string)
+		return true
+	})
+
 	return response
 }
 
 func GetNodes() []string {
-	mapNodes, _ := strconv.ParseInt(os.Getenv("MAP_NODE_COUNT"), 10, 64)
-	reduceNodes, err := strconv.ParseInt(os.Getenv("REDUCE_NODE_COUNT"), 10, 64)
-	if err != nil {
-		log.Fatal("Error parsing the env variables")
-	}
+	mapNodes, reduceNodes := GetNodesCountByType()
 	res := []string{}
-	var i int64
-	for i = 1; i <= mapNodes; i++ {
+	for i := 1; i <= mapNodes; i++ {
 		res = append(res, "map-"+strconv.Itoa(int(i)))
 	}
-	for i = 1; i <= reduceNodes; i++ {
+	for i := 1; i <= reduceNodes; i++ {
 		res = append(res, "reduce-"+strconv.Itoa(int(i)))
 	}
 	res = append(res, "master")
 	return res
 }
 
-func StatusCheck() {
+func GetNodesCountByType() (int, int) {
+	mapNodes, err := strconv.Atoi(os.Getenv("MAP_NODE_COUNT"))
+	if err != nil {
+		log.Fatal("Error parsing MAP_NODE_COUNT")
+	}
+	reduceNodes, err := strconv.Atoi(os.Getenv("REDUCE_NODE_COUNT"))
+	if err != nil {
+		log.Fatal("Error parsing REDUCE_NODE_COUNT")
+	}
+	return mapNodes, reduceNodes
+}
+
+func updateNodeStatus(statusMap *sync.Map) {
+	nodes := GetNodes()
+
+	var wg sync.WaitGroup
+	// Check status of nodes concurrently
+	for _, node := range nodes {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			if err := PingNode(node); err != nil {
+				statusMap.Store(node, "DOWN")
+			} else {
+				statusMap.Store(node, "UP")
+			}
+		}()
+	}
+	wg.Wait()
+}
+
+func StatusCheck(statusMap *sync.Map, interval time.Duration) {
 	for {
 		log.Printf("Heartbeat check...")
-		response := GetNodesStatus()
-		nodes := GetNodes()
-		for _, node := range nodes {
-			if response.StatusJson[node] != "UP" {
+		updateNodeStatus(statusMap)
+		statusMap.Range(func(node, status any) bool {
+			if status.(string) != "UP" {
 				// take appropriate action when the node is down
-				log.Printf("node %s is DOWN...\n", node)
+				log.Printf("node %s is DOWN...\n", node.(string))
 			}
-		}
-		time.Sleep(1 * time.Minute)
+			return true
+		})
+		time.Sleep(interval)
 	}
 }

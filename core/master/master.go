@@ -2,24 +2,34 @@ package master
 
 import (
 	"fmt"
-	"html"
-	"log"
 	"net/http"
+	"sync"
+	"time"
 
 	"github.com/SystemsStuff/ShrinkSync/core/utils"
 )
 
-func MasterHandler(rw http.ResponseWriter, r *http.Request) {
-	// Some cool GoLang code coming up
+type MasterContext struct {
+	statusMap sync.Map
+	numMapTasks int
+	numReducePartitions int
+	numMapNodes int
+	numReduceNodes int
+}
 
+func InitMaster(mux *http.ServeMux) {
+
+	masterContext := &MasterContext{}
+	masterContext.numMapNodes, masterContext.numReduceNodes = utils.GetNodesCountByType()
+	// Add logic for number of map tasks and reduce partitions
+	masterContext.numMapTasks, masterContext.numReducePartitions = 5,5
+	fmt.Println(masterContext)
+	mux.HandleFunc("GET /infra-health", masterContext.InfraHealthHandler)
+
+	masterContext.startNodeStatusMonitor( 100 * time.Millisecond )
+}
+
+func (masterContext *MasterContext) startNodeStatusMonitor( interval time.Duration ) {
 	// go routine to periodically check status of all worker nodes, need to handle the case of this becoming an "orphan"
-	go utils.StatusCheck()
-
-	mux := http.NewServeMux()
-	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path[1:]))
-	})
-	mux.HandleFunc("GET /infra-health", InfraHealthHandler)
-
-	log.Fatal(http.ListenAndServe(":9090", mux))
+	go utils.StatusCheck(&masterContext.statusMap, interval)
 }

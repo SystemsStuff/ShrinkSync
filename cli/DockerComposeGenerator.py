@@ -6,6 +6,8 @@ def generate_docker_compose(map_node_count, reduce_node_count):
     build: .
     image: shrink-sync-node
     container_name: master
+    ports:
+      - "8080:8080"
     environment:
         - MAP_NODE_COUNT={map_node_count}
         - REDUCE_NODE_COUNT={reduce_node_count}

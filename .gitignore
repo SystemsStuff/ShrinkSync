@@ -1,2 +1,7 @@
 bin
 cli/docker-compose.yaml
+Dockerfile
+DockerComposeGenerator.py
+Makefile
+main.go
+docker-compose.yaml
