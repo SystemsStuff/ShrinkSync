@@ -3,7 +3,7 @@ setup: infra datagrid
 network:
 	- docker network create shrink-sync-network -d bridge
 
-infra: network
+infra: network datagrid
 	- python3 DockerComposeGenerator.py
 	- docker compose up -d --build
 	- echo "\nInfra Setup Done"
@@ -15,9 +15,10 @@ datagrid: network
 
 clean:
 	- docker compose down --remove-orphans
+	- docker network rm shrink-sync-network
 	- rm -f docker-compose.yaml
 	- echo "\nInfra setup cleaned"
 	- docker container stop datagrid || true && docker container rm datagrid || true
 	- echo "\nDatagrid setup cleaned"
 
-.PHONY: infra datagrid clean
+.PHONY: infra datagrid network clean

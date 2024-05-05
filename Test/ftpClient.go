@@ -69,7 +69,7 @@ func connect(server string, network string, port int) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println("Successfully logged in as user foo\n")
+	log.Println("Successfully logged in as user foo")
 }
 
 func main() {
@@ -78,5 +78,5 @@ func main() {
 	upload_file("test_input", "./TestInput/test_input")
 	upload_data("Hello World!", "./TestInput/test_input_1")
 	file_content := download_file("./TestInput/test_input")
-	fmt.Println("File Content: %s", file_content)
+	fmt.Printf("File Content: %s", file_content)
 }
