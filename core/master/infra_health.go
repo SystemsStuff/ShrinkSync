@@ -8,7 +8,7 @@ import (
 )
 
 func (masterContext *MasterContext) InfraHealthHandler(rw http.ResponseWriter, r *http.Request) {
-	nodes_status := utils.GetNodesStatus(&masterContext.statusMap)
+	nodes_status := utils.GetNodesStatus(&masterContext.nodeStatusMap)
 	rw.Header().Set("Content-Type", "application/json")
 	encoder := json.NewEncoder(rw)
 	if err := encoder.Encode(nodes_status); err != nil {
